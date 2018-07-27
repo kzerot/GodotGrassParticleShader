@@ -1,0 +1,108 @@
+[gd_scene load_steps=4 format=2]
+
+[ext_resource path="res://Grasses.png" type="Texture" id=1]
+
+[sub_resource type="Shader" id=1]
+
+code = "shader_type particles;
+
+uniform float spacing = 10;
+uniform float height = 40.0;
+uniform float angle : hint_range(0.1, 2.0) = 0.5;
+uniform float period: hint_range(0.1, 5.0)  = 1.0;
+uniform float min_height_random: hint_range(0.1,2) = 0.8;
+uniform float max_height_random: hint_range(0.1,2) = 1.2;
+
+float rand_from_seed(inout uint seed) {
+	int k;
+	int s = int(seed);
+	if (s == 0)
+	s = 305420679;
+	k = s / 127773;
+	s = 16807 * (s - k * 127773) - 2836 * k;
+	if (s < 0)
+		s += 2147483647;
+	return float(uint(seed) % uint(65536))/65535.0;
+}
+
+uint hash(uint x) {
+	x = ((x >> uint(16)) ^ x) * uint(73244475);
+	x = ((x >> uint(16)) ^ x) * uint(73244475);
+	x = (x >> uint(16)) ^ x;
+	return x;
+}
+
+
+void vertex(){
+//    uint seed = hash(NUMBER+uint(1)+ uint(372846));
+    uint seed = hash(uint(INDEX));
+    float pi = 3.14159;
+	float degree_to_rad = pi / 180.0;
+    float h_mod = min_height_random + (max_height_random-min_height_random) * rand_from_seed(seed);
+    //height = rand_from_seed(seed) * height;
+    float f = height /2.0 * h_mod;
+    vec2 pos = vec2(0.0,0.0);
+    pos.x = float(INDEX);
+    pos *= spacing;
+    TRANSFORM[3][0] = pos.x;
+    TRANSFORM[3][1] = -f;
+
+    CUSTOM.x = cos(TIME*period) * angle;
+    
+    TRANSFORM[3][1] -= cos(CUSTOM.x) * f  -f;
+    TRANSFORM[3][0] -= sin(CUSTOM.x) * f;
+//    vec3 res = rotate(TRANSFORM[3].xyz, vec3(0.0,0.0,1.0),0.6);
+//    TRANSFORM[3].xyz = res;
+    TRANSFORM[0] = vec4(cos(CUSTOM.x),-sin(CUSTOM.x),0.0,0.0);
+	TRANSFORM[1] = vec4(sin(CUSTOM.x),cos(CUSTOM.x),0.0,0.0);
+	TRANSFORM[2] = vec4(0.0,0.0,1.0,0.0);
+	TRANSFORM[0].xyz *= h_mod;
+	TRANSFORM[1].xyz *= h_mod;
+	TRANSFORM[2].xyz *= h_mod;
+
+    CUSTOM.z = rand_from_seed(seed);
+    CUSTOM.y = rand_from_seed(seed);
+ 
+    
+}
+
+"
+
+[sub_resource type="ShaderMaterial" id=2]
+
+render_priority = 0
+shader = SubResource( 1 )
+shader_param/spacing = 10.0
+shader_param/height = 200.0
+shader_param/angle = 0.3
+shader_param/period = 1.0
+shader_param/min_height_random = 0.8
+shader_param/max_height_random = 1.2
+_sections_unfolded = [ "shader_param" ]
+
+[node name="root" type="Node2D" index="0"]
+
+[node name="Particles2D" type="Particles2D" parent="." index="0"]
+
+position = Vector2( 212.915, 394.34 )
+emitting = true
+amount = 60
+lifetime = 1.0
+one_shot = false
+preprocess = 0.0
+speed_scale = 1.0
+explosiveness = 0.0
+randomness = 0.0
+fixed_fps = 0
+fract_delta = true
+visibility_rect = Rect2( -100, -100, 200, 200 )
+local_coords = true
+draw_order = 0
+process_material = SubResource( 2 )
+texture = ExtResource( 1 )
+normal_map = null
+h_frames = 19
+v_frames = 1
+_sections_unfolded = [ "Process Material", "Textures" ]
+
+
