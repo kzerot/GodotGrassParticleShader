@@ -1,6 +1,6 @@
 # GodotGrassParticleShader
 Very simple shader for 2d grass using particles shader
-
+Updated to 3.3
 Shader params:
 
 Param | Description
