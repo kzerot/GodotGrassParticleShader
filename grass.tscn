@@ -1,9 +1,15 @@
-[gd_scene load_steps=4 format=2]
+[gd_scene load_steps=8 format=2]
 
 [ext_resource path="res://Grasses.png" type="Texture" id=1]
+[ext_resource path="res://icon.png" type="Texture" id=2]
 
-[sub_resource type="Shader" id=1]
+[sub_resource type="CanvasItemMaterial" id=1]
+particles_animation = true
+particles_anim_h_frames = 19
+particles_anim_v_frames = 1
+particles_anim_loop = true
 
+[sub_resource type="Shader" id=2]
 code = "shader_type particles;
 
 uniform float spacing = 10;
@@ -47,8 +53,8 @@ void vertex(){
     TRANSFORM[3][0] = pos.x;
     TRANSFORM[3][1] = -f;
 
+//	CUSTOM.x = pi/2.;
     CUSTOM.x = cos(TIME*period) * angle;
-    
     TRANSFORM[3][1] -= cos(CUSTOM.x) * f  -f;
     TRANSFORM[3][0] -= sin(CUSTOM.x) * f;
 //    vec3 res = rotate(TRANSFORM[3].xyz, vec3(0.0,0.0,1.0),0.6);
@@ -59,6 +65,7 @@ void vertex(){
 	TRANSFORM[0].xyz *= h_mod;
 	TRANSFORM[1].xyz *= h_mod;
 	TRANSFORM[2].xyz *= h_mod;
+	
 
     CUSTOM.z = rand_from_seed(seed);
     CUSTOM.y = rand_from_seed(seed);
@@ -68,41 +75,39 @@ void vertex(){
 
 "
 
-[sub_resource type="ShaderMaterial" id=2]
-
-render_priority = 0
-shader = SubResource( 1 )
+[sub_resource type="ShaderMaterial" id=3]
+shader = SubResource( 2 )
 shader_param/spacing = 10.0
 shader_param/height = 200.0
 shader_param/angle = 0.3
 shader_param/period = 1.0
 shader_param/min_height_random = 0.8
 shader_param/max_height_random = 1.2
-_sections_unfolded = [ "shader_param" ]
 
-[node name="root" type="Node2D" index="0"]
+[sub_resource type="CanvasItemMaterial" id=4]
+particles_animation = true
+particles_anim_h_frames = 10
+particles_anim_v_frames = 10
+particles_anim_loop = false
 
-[node name="Particles2D" type="Particles2D" parent="." index="0"]
+[sub_resource type="ParticlesMaterial" id=5]
+flag_disable_z = true
+gravity = Vector3( 0, 98, 0 )
+orbit_velocity = 0.0
+orbit_velocity_random = 0.0
+anim_speed = 14.89
 
+[node name="root" type="Node2D"]
+
+[node name="Particles2D" type="Particles2D" parent="."]
+material = SubResource( 1 )
 position = Vector2( 212.915, 394.34 )
-emitting = true
-amount = 60
-lifetime = 1.0
-one_shot = false
-preprocess = 0.0
-speed_scale = 1.0
-explosiveness = 0.0
-randomness = 0.0
-fixed_fps = 0
-fract_delta = true
-visibility_rect = Rect2( -100, -100, 200, 200 )
-local_coords = true
-draw_order = 0
-process_material = SubResource( 2 )
+amount = 100
+process_material = SubResource( 3 )
 texture = ExtResource( 1 )
-normal_map = null
-h_frames = 19
-v_frames = 1
-_sections_unfolded = [ "Process Material", "Textures" ]
 
-
+[node name="Particles2D2" type="Particles2D" parent="."]
+visible = false
+material = SubResource( 4 )
+process_material = SubResource( 5 )
+texture = ExtResource( 2 )
